@@ -43,7 +43,13 @@ type=http-request, pattern=https:\/\/((weather-data\.apple)|(api.weather))\.com,
 /********************** SCRIPT START *********************************/
 const $ = API("caiyun");
 const ERR = MYERR();
-const display_location = JSON.parse($.read("display_location") || "false");
+
+let display_location = $.read("display_location");
+if (display_location === undefined) {
+  display_location = false;
+} else {
+  display_location = JSON.parse(display_location);
+}
 
 if (typeof $request !== "undefined") {
   // get location from request url
@@ -110,7 +116,7 @@ if (typeof $request !== "undefined") {
             "open-url": "https://t.me/cool_scripts",
           }
         );
-      else $.notify("[彩云天气]", "❌ 出现错误", err.message);
+      else $.notify("[彩云天气]", "❌ 出现错误", err);
     })
     .finally($.done());
 }
@@ -254,6 +260,52 @@ function realtimeWeather() {
       `${now}-${dt.getHours() + 1}时 ${mapSkycon(skycon.value)[0]}` +
       (i == 2 ? "" : "\n");
   }
+        $.notify(
+          `[彩云天气] ${address.city} ${address.district} ${address.street}`,
+          alert.title,
+          alert.description
+        );
+        alerted.push(alert.alertId);
+        if (alerted.length > 10) {
+          alerted.shift();
+        }
+        $.write(alerted, "alerted");
+      }
+    });
+  }
+}
+
+function realtimeWeather() {
+  const data = $.weather.result;
+  const address = $.address;
+
+  const alert = data.alert;
+  const alertInfo =
+    alert.content.length == 0
+      ? ""
+      : alert.content.reduce((acc, curr) => {
+          if (curr.status === "预警中") {
+            return acc + "\n" + mapAlertCode(curr.code) + "预警";
+          } else {
+            return acc;
+          }
+        }, "[预警]") + "\n\n";
+
+  const realtime = data.realtime;
+  const keypoint = data.forecast_keypoint;
+
+  const hourly = data.hourly;
+
+  let hourlySkycon = "[未来3小时]\n";
+  for (let i = 0; i < 3; i++) {
+    const skycon = hourly.skycon[i];
+    const dt = new Date(skycon.datetime);
+    const now = dt.getHours() + 1;
+    dt.setHours(dt.getHours() + 1);
+    hourlySkycon +=
+      `${now}-${dt.getHours() + 1}时 ${mapSkycon(skycon.value)[0]}` +
+      (i == 2 ? "" : "\n");
+  }
 
   $.notify(
     `[彩云天气] ${address.city} ${address.district} ${address.street}`,
@@ -265,7 +317,10 @@ function realtimeWeather() {
       realtime.apparent_temperature
     }℃ 💧 湿度 ${(realtime.humidity * 100).toFixed(0)}%
 ☀️ 紫外线 ${realtime.life_index.ultraviolet.desc} 💨 气压 ${realtime.pressure}(Pa)
-👀 能见度 ${realtime.visibility}km 🌪 风力 ${mapWind(realtime.wind.speed, realtime.wind.direction)}
+👀 能见度 ${realtime.visibility}km 🌪 风力 ${mapWind(
+      realtime.wind.speed,
+      realtime.wind.direction
+    )}
 
 ${alertInfo}${hourlySkycon}
 `,
@@ -312,10 +367,13 @@ function mapAlertCode(code) {
 
 function mapWind(speed, direction) {
   let description = "";
+  let d_description = "";
+
   if (speed < 1) {
     description = "无风";
+    return description;
   } else if (speed <= 5) {
-    description = "1级 清风徐徐";
+    description = "1级 微风徐徐";
   } else if (speed <= 11) {
     description = "2级 清风";
   } else if (speed <= 19) {
@@ -332,36 +390,133 @@ function mapWind(speed, direction) {
     description = "8级 狂风大作";
   } else if (speed <= 88) {
     description = "9级 狂风呼啸";
-  } else {
-    description = ">9级 超级强风";
+  } else if (speed <= 102) {
+    description = "10级 暴风毁树";
+  } else if (speed <= 117) {
+    description = "11级 暴风毁树";
+  } else if (speed <= 133) {
+    description = "12级 飓风";
+  } else if (speed <= 149) {
+    description = "13级 台风";
+  } else if (speed <= 166) {
+    description = "14级 强台风";
+  } else if (speed <= 183) {
+    description = "15级 强台风";
+  } else if (speed <= 201) {
+    description = "16级 超强台风";
+  } else if (speed <= 220) {
+    description = "17级 超强台风";
   }
-  return description;
+
+  if (direction >= 348.76 || direction <= 11.25) {
+    d_description = "北";
+  } else if (direction >= 11.26 && direction <= 33.75) {
+    d_description = "北东北";
+  } else if (direction >= 33.76 && direction <= 56.25) {
+    d_description = "东北";
+  } else if (direction >= 56.26 && direction <= 78.75) {
+    d_description = "东东北";
+  } else if (direction >= 78.76 && direction <= 101.25) {
+    d_description = "东";
+  } else if (direction >= 101.26 && direction <= 123.75) {
+    d_description = "东东南";
+  } else if (direction >= 123.76 && direction <= 146.25) {
+    d_description = "东南";
+  } else if (direction >= 146.26 && direction <= 168.75) {
+    d_description = "南东南";
+  } else if (direction >= 168.76 && direction <= 191.25) {
+    d_description = "南";
+  } else if (direction >= 191.26 && direction <= 213.75) {
+    d_description = "南西南";
+  } else if (direction >= 213.76 && direction <= 236.25) {
+    d_description = "西南";
+  } else if (direction >= 236.26 && direction <= 258.75) {
+    d_description = "西西南";
+  } else if (direction >= 258.76 && direction <= 281.25) {
+    d_description = "西";
+  } else if (direction >= 281.26 && direction <= 303.75) {
+    d_description = "西西北";
+  } else if (direction >= 303.76 && direction <= 326.25) {
+    d_description = "西北";
+  } else if (direction >= 326.26 && direction <= 348.75) {
+    d_description = "北西北";
+  }
+
+  return `${d_description}风 ${description}`;
 }
 
 // 天气状况 --> 自然语言描述
-// icon来源：https://dribbble.com/kel
+// icon来源：github@58xinian
 function mapSkycon(skycon) {
   const map = {
-    "CLEAR_DAY": ["☀️ 日间晴朗", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLEAR_DAY.gif"],
-    "CLEAR_NIGHT": ["✨ 夜间晴朗", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLEAR_NIGHT.gif"],
-    "PARTLY_CLOUDY_DAY": ["⛅️ 日间多云", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/PARTLY_CLOUDY_DAY.gif"],
-    "PARTLY_CLOUDY_NIGHT": ["☁️ 夜间多云", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/PARTLY_CLOUDY_NIGHT.gif"],
-    "CLOUDY": ["☁️ 阴", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLOUDY.gif"],
-    "LIGHT_HAZE": ["😤 轻度雾霾", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif"],
-    "MODERATE_HAZE": ["😤 中度雾霾", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif"],
-    "HEAVY_HAZE": ["😤 重度雾霾", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif"],
-    "LIGHT_RAIN": ["💧 小雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/LIGHT.gif"],
-    "MODERATE_RAIN": ["💦 中雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/MODERATE_RAIN.gif"],
-    "HEAVY_RAIN": ["🌧 大雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/STORM_RAIN.gif"],
-    "STORM_RAIN": ["⛈ 暴雨", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/STORM_RAIN.gif"],
-    "LIGHT_SNOW": ["🌨 小雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/LIGHT_SNOW.gif"],
-    "MODERATE_SNOW": ["❄️ 中雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/MODERATE_SNOW.gif"],
-    "HEAVY_SNOW": ["☃️ 大雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HEAVY_SNOW.gif"],
-    "STORM_SNOW": ["⛄️暴雪", "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HEAVY_SNOW"],
-    "DUST": ["💨 浮尘"],
-    "SAND": ["💨 沙尘"],
-    "WIND": ["🌪 大风"]
-  }
+    CLEAR_DAY: [
+      "☀️ 日间晴朗",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLEAR_DAY.gif",
+    ],
+    CLEAR_NIGHT: [
+      "✨ 夜间晴朗",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLEAR_NIGHT.gif",
+    ],
+    PARTLY_CLOUDY_DAY: [
+      "⛅️ 日间多云",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/PARTLY_CLOUDY_DAY.gif",
+    ],
+    PARTLY_CLOUDY_NIGHT: [
+      "☁️ 夜间多云",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/PARTLY_CLOUDY_NIGHT.gif",
+    ],
+    CLOUDY: [
+      "☁️ 阴",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/CLOUDY.gif",
+    ],
+    LIGHT_HAZE: [
+      "😤 轻度雾霾",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif",
+    ],
+    MODERATE_HAZE: [
+      "😤 中度雾霾",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif",
+    ],
+    HEAVY_HAZE: [
+      "😤 重度雾霾",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HAZE.gif",
+    ],
+    LIGHT_RAIN: [
+      "💧 小雨",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/LIGHT.gif",
+    ],
+    MODERATE_RAIN: [
+      "💦 中雨",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/MODERATE_RAIN.gif",
+    ],
+    HEAVY_RAIN: [
+      "🌧 大雨",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/STORM_RAIN.gif",
+    ],
+    STORM_RAIN: [
+      "⛈ 暴雨",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/STORM_RAIN.gif",
+    ],
+    LIGHT_SNOW: [
+      "🌨 小雪",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/LIGHT_SNOW.gif",
+    ],
+    MODERATE_SNOW: [
+      "❄️ 中雪",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/MODERATE_SNOW.gif",
+    ],
+    HEAVY_SNOW: [
+      "☃️ 大雪",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HEAVY_SNOW.gif",
+    ],
+    STORM_SNOW: [
+      "⛄️暴雪",
+      "https://raw.githubusercontent.com/58xinian/icon/master/Weather/HEAVY_SNOW",
+    ],
+    DUST: ["💨 浮尘"],
+    SAND: ["💨 沙尘"],
+    WIND: ["🌪 大风"],
+  };
   return map[skycon];
 }
 
