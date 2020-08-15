@@ -260,52 +260,6 @@ function realtimeWeather() {
       `${now}-${dt.getHours() + 1}时 ${mapSkycon(skycon.value)[0]}` +
       (i == 2 ? "" : "\n");
   }
-        $.notify(
-          `[彩云天气] ${address.city} ${address.district} ${address.street}`,
-          alert.title,
-          alert.description
-        );
-        alerted.push(alert.alertId);
-        if (alerted.length > 10) {
-          alerted.shift();
-        }
-        $.write(alerted, "alerted");
-      }
-    });
-  }
-}
-
-function realtimeWeather() {
-  const data = $.weather.result;
-  const address = $.address;
-
-  const alert = data.alert;
-  const alertInfo =
-    alert.content.length == 0
-      ? ""
-      : alert.content.reduce((acc, curr) => {
-          if (curr.status === "预警中") {
-            return acc + "\n" + mapAlertCode(curr.code) + "预警";
-          } else {
-            return acc;
-          }
-        }, "[预警]") + "\n\n";
-
-  const realtime = data.realtime;
-  const keypoint = data.forecast_keypoint;
-
-  const hourly = data.hourly;
-
-  let hourlySkycon = "[未来3小时]\n";
-  for (let i = 0; i < 3; i++) {
-    const skycon = hourly.skycon[i];
-    const dt = new Date(skycon.datetime);
-    const now = dt.getHours() + 1;
-    dt.setHours(dt.getHours() + 1);
-    hourlySkycon +=
-      `${now}-${dt.getHours() + 1}时 ${mapSkycon(skycon.value)[0]}` +
-      (i == 2 ? "" : "\n");
-  }
 
   $.notify(
     `[彩云天气] ${address.city} ${address.district} ${address.street}`,
