@@ -271,7 +271,7 @@ function realtimeWeather() {
       realtime.apparent_temperature
     }℃ 💧 湿度 ${(realtime.humidity * 100).toFixed(0)}%
 ☀️ 紫外线 ${realtime.life_index.ultraviolet.desc} 💨 气压 ${realtime.pressure}(Pa)
-👀 能见度 ${realtime.visibility}km 🌪 风力 ${mapWind(
+👀 能见度 ${realtime.visibility}km 🌪 ${mapWind(
       realtime.wind.speed,
       realtime.wind.direction
     )}
