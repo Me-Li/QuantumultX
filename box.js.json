@@ -1,9 +1,8 @@
-
 {
   "id": "pengym.app.sub",
   "name": "Peng-YM 应用订阅",
   "author": "@Peng-YM",
-  "icon": "https://raw.githubusercontent.com/Me-Li/Icon/master/RedBull.jpg",
+  "icon": "https://avatars2.githubusercontent.com/u/21050064?s=460&u=40a74913dd0a3d00670d05148c3a08c787470021&v=4",
   "repo": "https://github.com/Peng-YM/QuanX",
   "apps": [
     {
@@ -150,9 +149,9 @@
         {
           "id": "@caiyun.token.caiyun",
           "name": "彩云天气API Token",
-          "val": "u1DYJU6ZxL1EQPiN",
+          "val": "u1DYJU6ZxL1EQPiN"
           "type": "text",
-          "autoGrow": true,
+          "autoGrow": false,
           "rows": 2,
           "desc": "彩云天气的Token，可以自行申请或者前往频道获取"
         },
@@ -167,7 +166,7 @@
         {
           "id": "@caiyun.display_location",
           "name": "是否在日志中显示经纬度",
-          "val": true,
+          "val": false,
           "type": "boolean",
           "desc": ""
         },
@@ -272,8 +271,144 @@
         }
       ],
       "icons": [
+        "https://github.com/Peng-YM/QuanX/blob/master/assets/icons/Surge_run_transparent1.png?raw=true",
+        "https://github.com/Peng-YM/QuanX/blob/master/assets/icons/Surge_run1.png?raw=true"
+      ]
+    },
+    {
+      "id": "surge-auto-policy",
+      "name": "Surge自动策略",
+      "keys": [
+        "@surge_auto_policy.silence",
+        "@surge_auto_policy.cellular",
+        "@surge_auto_policy.wifi",
+        "@surge_auto_policy.all_direct",
+        "@surge_auto_policy.all_proxy",
+        "@surge_auto_policy.whitelist",
+        "@surge_auto_policy.global_proxy",
+        "@surge_auto_policy.global_direct"
+      ],
+      "author": "@Peng-YM",
+      "repo": "https://github.com/Peng-YM/QuanX",
+      "settings": [
+        {
+          "id": "@surge_auto_policy.silence",
+          "name": "静默运行",
+          "val": false,
+          "type": "boolean",
+          "desc": "打开后模式切换时不显示通知"
+        },
+        {
+          "id": "@surge_auto_policy.global_proxy",
+          "name": "全局代理模式下启动的策略",
+          "val": "📌 手动选择 <== 注意需要改成自己的策略！",
+          "type": "text",
+          "desc": "全局代理模式下，所有不在白名单的策略组将自动切换至此策略。"
+        },
+        {
+          "id": "@surge_auto_policy.global_direct",
+          "name": "全局直连模式下启动的策略",
+          "val": "DIRECT",
+          "type": "text",
+          "desc": "全局直连模式下，所有不在白名单的策略组将自动切换至此策略。"
+        },
+        {
+          "id": "@surge_auto_policy.cellular",
+          "name": "默认蜂窝数据模式",
+          "val": "RULE",
+          "type": "radios",
+          "items": [
+            {
+              "key": "RULE",
+              "label": "规则模式"
+            },
+            {
+              "key": "PROXY",
+              "label": "全局代理模式"
+            },
+            {
+              "key": "DIRECT",
+              "label": "全局直连模式"
+            }
+          ],
+          "desc": "默认规则模式"
+        },
+        {
+          "id": "@surge_auto_policy.wifi",
+          "name": "默认WIFI模式",
+          "val": "RULE",
+          "type": "radios",
+          "items": [
+            {
+              "key": "RULE",
+              "label": "规则模式"
+            },
+            {
+              "key": "PROXY",
+              "label": "全局代理模式"
+            },
+            {
+              "key": "DIRECT",
+              "label": "全局直连模式"
+            }
+          ],
+          "desc": "默认规则模式"
+        },
+        {
+          "id": "@surge_auto_policy.all_direct",
+          "name": "全局直连的WIFI列表",
+          "val": "WRT32X, WRT32X Extreme",
+          "type": "text",
+          "desc": "填入全局直连的WIFI名称，多个WIFI用逗号分隔"
+        },
+        {
+          "id": "@surge_auto_policy.all_proxy",
+          "name": "全局代理的WIFI列表",
+          "val": "",
+          "type": "text",
+          "desc": "填入全局代理的WIFI名称，多个WIFI用逗号分隔"
+        },
+        {
+          "id": "@surge_auto_policy.whitelist",
+          "name": "白名单策略",
+          "val": "Netease, AdGuard",
+          "type": "text",
+          "desc": "填入白名单列表，在此列表中的策略不会执行切换。比如说去广告策略，网易云等策略可以加入此列表。多个策略用逗号分隔"
+        }
+      ],
+      "icons": [
         "https://github.com/Peng-YM/QuanX/blob/master/assets/icons/Surge_run_transparent.png?raw=true",
         "https://github.com/Peng-YM/QuanX/blob/master/assets/icons/Surge_run.png?raw=true"
+      ]
+    },
+    {
+      "id": "github-private-repo",
+      "name": "Github私有仓库",
+      "keys": [
+        "@github_private_repo.username",
+        "@github_private_repo.token"
+      ],
+      "author": "@Peng-YM",
+      "repo": "https://github.com/Peng-YM/QuanX",
+      "settings": [
+        {
+          "id": "@github_private_repo.username",
+          "name": "Github用户名",
+          "val": "",
+          "type": "text",
+          "desc": "你的Github用户名"
+        },
+        {
+          "id": "@github_private_repo.token",
+          "name": "Github仓库的Token",
+          "val": "",
+          "type": "text",
+          "desc": "请参照脚本说明生成token，否则无法访问！"
+        }
+      ],
+      "icons": [
+        "https://raw.githubusercontent.com/58xinian/icon/master/Github_mini.png",
+        "https://raw.githubusercontent.com/58xinian/icon/master/Github.png"
       ]
     }
   ]
