@@ -149,7 +149,7 @@
         {
           "id": "@caiyun.token.caiyun",
           "name": "彩云天气API Token",
-          "val": "u1DYJU6ZxL1EQPiN"
+          "val": null,
           "type": "text",
           "autoGrow": false,
           "rows": 2,
@@ -158,7 +158,7 @@
         {
           "id": "@caiyun.token.tencent",
           "name": "腾讯地图API Token",
-          "val": "LRMBZ-5NXKF-DWYJW-NPZNU-U7PJV-FCFGU",
+          "val": "AHEBZ-ASTWX-CIW4P-7TV7T-AWKLS-7CFWP",
           "type": "text",
           "rows": 1,
           "desc": ""
